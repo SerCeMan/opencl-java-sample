@@ -1,0 +1,26 @@
+
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '1.2.1'
+}
+
+group 'ru.serce'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.5
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'ru.serce.Main'
+    }
+}
+
+dependencies {
+    compile 'org.jogamp.jocl:jocl:2.3.2'
+    compile 'org.jogamp.jocl:jocl-main:2.3.2'
+    compile 'org.jogamp.gluegen:gluegen-rt-main:2.3.2'
+}
