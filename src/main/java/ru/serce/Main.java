@@ -7,27 +7,45 @@ import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLProgram;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.FloatBuffer;
 import java.util.Scanner;
 
 import static com.jogamp.opencl.CLMemory.Mem.READ_ONLY;
 import static com.jogamp.opencl.CLMemory.Mem.READ_WRITE;
-import static java.lang.System.out;
 
 /**
  * ./gradlew shadow && java -jar build/libs/opencl2-1.0-SNAPSHOT-all.jar
  */
 public class Main {
 
-    private static final Scanner in = new Scanner(System.in);
+    private static final Scanner in;
+    private static PrintStream out;
+
+    static {
+        FileInputStream result;
+        FileOutputStream output;
+        try {
+            result = new FileInputStream("input.txt");
+            output = new FileOutputStream("output.txt");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        in = new Scanner(result);
+        out = new PrintStream(output);
+    }
 
     public static void main(String[] args) throws IOException {
 
         // set up (uses default CLPlatform and creates context for all devices)
         CLContext context = CLContext.create();
-        out.println("created " + context);
+        System.out.println("created " + context);
 
         // always make sure to release the context under all circumstances
         // not needed for this particular sample but recommented
@@ -35,7 +53,7 @@ public class Main {
 
             // select fastest device
             CLDevice device = context.getMaxFlopsDevice();
-            out.println("using " + device);
+            System.out.println("using " + device);
 
             // create command queue on device.
             CLCommandQueue queue = device.createCommandQueue();
@@ -127,8 +145,10 @@ public class Main {
             queue.putReadBuffer(clOutputBuf, true);
             clOutputBuf.getBuffer().get(outputarr);
             for (int i = 0; i < NSIZE; ++i) {
-                System.out.print(outputarr[i] + " ");
+                out.print(outputarr[i] + " ");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             // cleanup all resources associated with this context.
             context.release();
